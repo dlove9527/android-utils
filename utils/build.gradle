@@ -1,8 +1,5 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.decndents.android-maven'
-apply plugin: 'com.jfrog.bintray'
-// 从version来区分library版本,因此当我们需要更新library时记得修改这个version
-version = "1.0.0"
+apply from: 'bintray.gradle'
 
 android {
     compileSdkVersion 23

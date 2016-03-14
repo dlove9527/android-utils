@@ -1,0 +1,90 @@
+// 1.使用插件,最开始添加在根节点依赖里面的
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+/**
+ * 2.定义相关网站
+ * 有单独的官方网站那是最好的，没用的话就用git网址就可以了
+ */
+def siteUrl = 'https://github.com/dlove9527/android-utils'  // 项目主页
+def gitUrl = 'https://github.com/dlove9527/android-utils.git'   // Git仓库的url
+
+/**
+ * 3.定义group
+ * compile 'com.android.support:recyclerview-v7:21.0.2'
+ * 引号内字符串以冒号分割为三部分，第一部分就是group，第二部分是name， 第三部分是上面定义的version。
+ */
+group = "tv.lycam.utils"
+// 4.添加版本
+version = "0.1.0"
+/**
+ * 5.定义pom并打包aar
+ * 上传到jcenter至少需要四个文件，除了打包的aar之外，还需要pom和javadoc，source，否则是通不过jcenter审核的。不过不用紧张，这些我们都可以用脚本生成
+ */
+install {
+	repositories.mavenInstaller {
+		// This generates POM.xml with proper parameters
+		pom {
+			project {
+				packaging 'aar'
+				name 'android-api'
+				url siteUrl
+				licenses {
+					license {
+						name 'The Apache Software License, Version 2.0'
+						url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+					}
+				}
+				developers {
+					developer {
+						id 'liujunhong'
+						name 'liujunhong'
+						email 'liujunhong@lycam.tv'
+					}
+				}
+				scm {
+					connection gitUrl
+					developerConnection gitUrl
+					url siteUrl
+				}
+			}
+		}
+	}
+}
+/**
+ * 6.打包javadocjar和sourcejar(必须)
+ */
+task sourcesJar(type: Jar) {
+	from android.sourceSets.main.java.srcDirs
+	classifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+	classifier = 'javadoc'
+	from android.sourceSets.main.java.source
+}
+
+artifacts {
+	archives javadocJar
+	archives sourcesJar
+}
+/**
+ * 7.上传到Jcenter仓库
+ * 示例值， 仅供参考
+ * bintray.user=openproject                                // your bintray user name
+ * bintray.apikey=c5434272d522d35d1a0123459981225564155753 // your bintray api key
+ */
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+bintray {
+	user = properties.getProperty("bintray.user")
+	key = properties.getProperty("bintray.apikey")
+	configurations = ['archives']
+	pkg {
+		repo = "maven"
+		name = "android-api"               // project name in jcenter
+		websiteUrl = siteUrl
+		vcsUrl = gitUrl
+		licenses = ["Apache-2.0"]
+		publish = true
+	}
+}
